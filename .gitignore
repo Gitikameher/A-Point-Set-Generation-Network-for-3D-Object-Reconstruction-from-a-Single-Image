@@ -1,0 +1,7 @@
+*.zip
+PyTorch*
+chamfer_distance/
+data/
+pyTorch*
+__pycache__
+.ipynb_checkpoints
