@@ -18,6 +18,7 @@ class XDataset(data.Dataset):
         self.point_cloud_root = point_cloud_root
         self.transform = transform
         self.use_2048 = use_2048
+        self.normalize = transforms.Compose([transforms.ToTensor()])
         
         
         # Init ids
@@ -65,6 +66,12 @@ class XDataset(data.Dataset):
             image = self.transform(image)
             
         image = np.asarray(image)
+#         print('Original image size = ', image.shape)
+        
+#         print('After transpose image size = ', image.shape)
+        image = self.normalize(image) # Change from (H, W, C) to (C, H, W)
+        
+#         print('After normalize image size = ', image.size())
             
             
         
