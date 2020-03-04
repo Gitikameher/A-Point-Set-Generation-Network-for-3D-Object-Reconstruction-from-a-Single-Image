@@ -42,7 +42,7 @@ def main():
     point_cloud_root = "./../../../datasets/cs253-wi20-public/ShapeNet_pointclouds/"
 
     num_epochs = 20
-    batch_size = 32
+    batch_size = 64
     shuffle = True
     num_workers = 8
     use_2048 = True
@@ -52,14 +52,14 @@ def main():
     transform = transforms.Compose([transforms.Resize(img_size,interpolation=2),transforms.CenterCrop(img_size)])
     
     # Checkpoint
-    use_checkpoint = True
+    use_checkpoint = False
 
     # Split and Get data. Override the saved files if you change the ratios.
-    train_ratio = 0.02
-    val_ratio = 0.01
-    test_ratio = 0.01
+    train_ratio = 0.8
+    val_ratio = 0.1
+    test_ratio = 0.1
 
-    split_data(train_ratio, val_ratio, test_ratio, overrideFiles = False)
+    split_data(train_ratio, val_ratio, test_ratio, overrideFiles = True)
 
     path_train = 'train_data.txt'
     path_val = 'val_data.txt'
