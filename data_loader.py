@@ -7,7 +7,7 @@ import numpy as np
 
 class XDataset(data.Dataset):
     """Custom Dataset compatible with torch.utils.data.DataLoader."""
-    def __init__(self, image_root, point_cloud_root, transform=None, use_2048 = True):
+    def __init__(self, image_root, point_cloud_root, id_pairs, transform=None, use_2048 = True):
         
         """
         Args:
@@ -19,6 +19,7 @@ class XDataset(data.Dataset):
         self.transform = transform
         self.use_2048 = use_2048
         self.normalize = transforms.Compose([transforms.ToTensor()])
+        self.id_pairs_set = set(id_pairs)
         
         
         # Init ids
@@ -38,6 +39,9 @@ class XDataset(data.Dataset):
             for specific_type in specific_types:
                 if specific_type.endswith('.tgz'):
                     continue
+                
+                if (image_type, specific_type) not in self.id_pairs_set:
+                    continue # Consider only those pairs which are supposed to be in the train/test/val data.
                 
                 path1 = os.path.join(os.path.join(os.path.join(image_root, image_type), specific_type), 'rendering')
                 temp = os.listdir(path1)
@@ -89,10 +93,10 @@ class XDataset(data.Dataset):
     def __len__(self):
         return len(self.ids)
 
-def get_loader(image_root, point_cloud_root, use_2048, transform, batch_size, shuffle, num_workers):
+def get_loader(image_root, point_cloud_root, id_pairs, use_2048, transform, batch_size, shuffle, num_workers):
     """Returns torch.utils.data.DataLoader for custom X dataset."""
     
-    xdataset = XDataset(image_root, point_cloud_root, transform = transform, use_2048 = use_2048)
+    xdataset = XDataset(image_root, point_cloud_root, id_pairs, transform = transform, use_2048 = use_2048)
     
     data_loader = torch.utils.data.DataLoader(dataset=xdataset, 
                                               batch_size=batch_size,
