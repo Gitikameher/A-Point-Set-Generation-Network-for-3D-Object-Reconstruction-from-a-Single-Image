@@ -4,6 +4,8 @@ import torch.utils.data as data
 import os
 from PIL import Image
 import numpy as np
+import glob
+import random
 
 class XDataset(data.Dataset):
     """Custom Dataset compatible with torch.utils.data.DataLoader."""
@@ -19,79 +21,114 @@ class XDataset(data.Dataset):
         self.transform = transform
         self.use_2048 = use_2048
         self.normalize = transforms.Compose([transforms.ToTensor()])
+        
+
         self.id_pairs_set = set(id_pairs)
+        self.id_pairs = id_pairs
+        self.len = len(id_pairs)
         
         
-        # Init ids
-        self.ids = []
+#         Init ids
+#         self.ids = []
         
-        # Store ids
+#         Store ids
         
-        image_types = os.listdir(image_root)
-        file_names = []
+#         image_types = os.listdir(image_root)
+#         file_names = []
         
-        for image_type in image_types:
-            if image_type.endswith('.tgz'):
-                    continue
+#         for image_type in image_types:
+#             if image_type.endswith('.tgz'):
+#                     continue
             
-            specific_types = os.listdir(os.path.join(image_root, image_type))
+#             specific_types = os.listdir(os.path.join(image_root, image_type))
             
-            for specific_type in specific_types:
-                if specific_type.endswith('.tgz'):
-                    continue
+#             for specific_type in specific_types:
+#                 if specific_type.endswith('.tgz'):
+#                     continue
                 
-                if (image_type, specific_type) not in self.id_pairs_set:
-                    continue # Consider only those pairs which are supposed to be in the train/test/val data.
+#                 if (image_type, specific_type) not in self.id_pairs_set:
+#                     continue # Consider only those pairs which are supposed to be in the train/test/val data.
                 
-                path1 = os.path.join(os.path.join(os.path.join(image_root, image_type), specific_type), 'rendering')
-                temp = os.listdir(path1)
+#                 path1 = os.path.join(os.path.join(os.path.join(image_root, image_type), specific_type), 'rendering')
+#                 temp = os.listdir(path1)
                 
-                for file_name in temp:
+#                 for file_name in temp:
                     
-                    if file_name.endswith('.png'):
-                        path = os.path.join(path1, file_name)
+#                     if file_name.endswith('.png'):
+#                         path = os.path.join(path1, file_name)
                         
-                        self.ids.append((image_type, specific_type, path))
+#                         self.ids.append((image_type, specific_type, path))
             
 
     
 
     def __getitem__(self, index):
-        """Returns one data pair (actual image and point cloud)."""
-        image_root = self.image_root
-        point_cloud_root = self.point_cloud_root
         
-        image_type, specific_type, image_path = self.ids[index]
+        image_type, specific_type = self.id_pairs[index]
         
-        # Load image and point cloud and return
+        image_path = os.path.join(self.image_root, image_type)
+        image_path = os.path.join(image_path, specific_type)
+        image_path = os.path.join(image_path, 'rendering')
+        
+        file_names = []
+        temp = os.listdir(image_path)
+        for file_name in temp:
+            if file_name.endswith('.png'):
+                file_names.append(file_name)
+        
+        # Pick a random image.
+        random_image = file_names[random.randint(0, len(file_names)-1)]
+        
+        image_path = os.path.join(image_path, random_image)
+            
         image = Image.open(image_path).convert('RGB')
         
         if self.transform is not None:
             image = self.transform(image)
             
-        image = np.asarray(image)
-#         print('Original image size = ', image.shape)
-        
-#         print('After transpose image size = ', image.shape)
-        image = self.normalize(image) # Change from (H, W, C) to (C, H, W)
-        
-#         print('After normalize image size = ', image.size())
             
-            
-        
+        # Get the point cloud
         if self.use_2048:
-            point_cloud_path = os.path.join(os.path.join(os.path.join(point_cloud_root, image_type), 
+            point_cloud_path = os.path.join(os.path.join(os.path.join(self.point_cloud_root, image_type), 
                                                      specific_type), 'pointcloud_2048.npy')
         else:
-            point_cloud_path = os.path.join(os.path.join(os.path.join(point_cloud_root, image_type), 
+            point_cloud_path = os.path.join(os.path.join(os.path.join(self.point_cloud_root, image_type), 
                                                      specific_type), 'pointcloud_1024.npy')
             
         point_cloud = np.load(point_cloud_path)
         
         return image, point_cloud
+        
+        
+#         """Returns one data pair (actual image and point cloud)."""
+#         image_root = self.image_root
+#         point_cloud_root = self.point_cloud_root
+        
+#         image_type, specific_type, image_path = self.ids[index]
+        
+#         # Load image and point cloud and return
+#         image = Image.open(image_path).convert('RGB')
+        
+#         if self.transform is not None:
+#             image = self.transform(image)
+            
+#         image = np.asarray(image)
+# #         print('Original image size = ', image.shape)
+        
+# #         print('After transpose image size = ', image.shape)
+#         image = self.normalize(image) # Change from (H, W, C) to (C, H, W)
+        
+# #         print('After normalize image size = ', image.size())
+            
+            
+        
+            
+
+        
+#         return image, point_cloud
 
     def __len__(self):
-        return len(self.ids)
+        return self.len
 
 def get_loader(image_root, point_cloud_root, id_pairs, use_2048, transform, batch_size, shuffle, num_workers):
     """Returns torch.utils.data.DataLoader for custom X dataset."""
