@@ -28,13 +28,18 @@ def split_data(train_ratio, val_ratio, test_ratio, overrideFiles = False):
         return
     
     # Otherwise, generate files.
-    image_root = "./../../../datasets/cs253-wi20-public/ShapeNetRendering/"
-    point_cloud_root = "./../../../datasets/cs253-wi20-public/ShapeNet_pointclouds/"
+#     image_root = "./../../../datasets/cs253-wi20-public/ShapeNetRendering/"
+#     point_cloud_root = "./../../../datasets/cs253-wi20-public/ShapeNet_pointclouds/"
+    image_root = "/datasets/cs253-wi20-public/ShapeNetRendering/"
+    point_cloud_root = "/datasets/cs253-wi20-public/ShapeNet_pointclouds/"
     
     train_data = []
     val_data = []
     test_data = []
     data = []
+    
+    print('Current dir = ', os.getcwd())
+    print(os.listdir('.'))
     
     image_types = os.listdir(image_root)
     file_names = []
