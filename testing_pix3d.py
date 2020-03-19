@@ -4,13 +4,14 @@ from matplotlib import pyplot as plt
 
 filenames = []
 paths = []
+mask_paths = []
 
 for filename in os.listdir('img/bed'):
     if filename.endswith('.png') or filename.endswith('.jpg'):
         filenames.append(filename)
         paths.append(os.path.join('img/bed', filename))
         
-mask_paths = []
+
 
 idx = 0
 for filename in filenames:
@@ -48,7 +49,7 @@ for idx in range(len(paths)):
     mask = transform(mask)
     
     # Multiply
-    print(image.size(), mask.size())
+#     print(image.size(), mask.size())
     
     image = image* mask
 #     break
