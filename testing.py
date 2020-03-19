@@ -25,6 +25,7 @@ from data_loader import XDataset, get_loader
 from split_data import read_from_file, write_to_file, split_data
 import time
 from train_ajit import train
+from visualize import Visualize
 
 
 
@@ -52,6 +53,8 @@ def main():
     transform = transforms.Compose([transforms.Resize(img_size,interpolation=2),
                                     transforms.CenterCrop(img_size),transforms.ToTensor()])
     
+    
+    
     path_test = 'test_data.txt'
     test_data = read_from_file(path_test)
     
@@ -62,15 +65,39 @@ def main():
     model = torch.load('best-Baseline_FixedDL.pt').to(device=gpu_or_cpu)
     model.eval()
     
+
+    
+    
     for i, (image, point_cloud) in enumerate(test_data_loader):
-        image, point_cloud = Variable(image), Variable(point_cloud)
+        image, point_cloud = Variable(image, requires_grad = False), Variable(point_cloud, requires_grad = False)
 
         image, point_cloud = image.float().to(device=gpu_or_cpu), point_cloud.float().to(device=gpu_or_cpu)
         pred = model(image)
         dist1, dist2 = chamferDist(pred, point_cloud)
         loss = (torch.mean(dist1)) + (torch.mean(dist2))
+        
+        print('pred size = ', pred.size())
+        pred = pred.to('cpu')
+        
+        out = []
+        
+        for p in pred:
+            out.append(p.detach().numpy())
+            
+        print('type(out) = ', type(out))
+        
+        
+        
+        
 
         # Visualize the prediction
+        print('asdf')
+        Visualize(out).ShowRandom()
+        break
+        
+        
+if __name__ == "__main__":
+    main()
         
 
 

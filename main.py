@@ -43,18 +43,18 @@ def main():
     image_root = "/datasets/cs253-wi20-public/ShapeNetRendering/"
     point_cloud_root = "/datasets/cs253-wi20-public/ShapeNet_pointclouds/"
 
-    num_epochs = 20
+    num_epochs = 1000
     batch_size = 64
     shuffle = True
     num_workers = 8
     use_2048 = True
     img_size = 227 # I don't know why, but this has to be 227!
-    learning_rate = 5e-4
-    num_points = 2500
+    learning_rate = 1e-4
+    num_points = 5000
     transform = transforms.Compose([transforms.Resize(img_size,interpolation=2),
                                     transforms.CenterCrop(img_size),transforms.ToTensor()])    
     # Checkpoint
-    use_checkpoint = True
+    use_checkpoint = False
 
     # Split and Get data. Override the saved files if you change the ratios.
     train_ratio = 0.8
@@ -91,7 +91,7 @@ def main():
     
     
     # Train
-    train_losses, val_loss, best_model = train(model, train_data_loader, val_data_loader, chamferDist, model_name="Baseline_FixedDL", num_epochs=num_epochs, lr=learning_rate, use_checkpoint = use_checkpoint)
+    train_losses, val_loss, best_model = train(model, train_data_loader, val_data_loader, chamferDist, model_name="Baseline_DL_Vis_5000", num_epochs=num_epochs, lr=learning_rate, use_checkpoint = use_checkpoint)
     
     
 if __name__ == "__main__":
