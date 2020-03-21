@@ -110,10 +110,10 @@ def main():
         # Train
         print('Starting training...')
         train_losses, val_loss, best_model = train(model, train_data_loader, val_data_loader, chamferDist,
-                                                   model_name="Baseline_DL_Vis_Demo", num_epochs=num_epochs, 
+                                                   model_name="Baseline_DL_Vis", num_epochs=num_epochs, 
                                                    lr=learning_rate, use_checkpoint = use_checkpoint)
     else:
-        best_model = torch.load('best-Baseline_DL_Vis_Demo.pt')
+        best_model = torch.load('best-Baseline_DL_Vis.pt')
         print('Loaded previously saved model.')
         
     model = best_model.cuda()
