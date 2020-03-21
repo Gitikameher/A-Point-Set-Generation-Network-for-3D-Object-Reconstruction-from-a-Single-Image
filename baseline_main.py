@@ -113,7 +113,7 @@ def main():
                                                    model_name="Baseline_DL_Vis_Demo", num_epochs=num_epochs, 
                                                    lr=learning_rate, use_checkpoint = use_checkpoint)
     else:
-        best_model = torch.load('best-Baseline_DL_Vis.pt')
+        best_model = torch.load('best-Baseline_DL_Vis_Demo.pt')
         print('Loaded previously saved model.')
         
     model = best_model.cuda()
